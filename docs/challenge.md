@@ -1,6 +1,8 @@
 # Part I
 ### Bug Fixes
 - fix parameters in barplot functions a it was not specifying x & y variables
+- in model line 24 union uses squared parenthesis "[]" not rounded ones "()".
+- fixed path for data on `tests/model/test_model.py` line 31
 
 ### Choose Model
 From the datacientist conclusions we can define that reducing to the 10 most important features and ballancing classes are both good ideas. But when choosing a model it does not give us much information.
