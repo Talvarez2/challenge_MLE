@@ -34,10 +34,11 @@ class DelayModel:
             or
             pd.DataFrame: features.
         """
-        data["period_day"] = data["Fecha-I"].apply(get_period_day)
-        data["high_season"] = data["Fecha-I"].apply(is_high_season)
-        data["min_diff"] = data.apply(get_min_diff, axis=1)
-        data["delay"] = np.where(data["min_diff"] > threshold_in_minutes, 1, 0)
+        if 'Fecha-I' in data.columns:
+            data["period_day"] = data["Fecha-I"].apply(get_period_day)
+            data["high_season"] = data["Fecha-I"].apply(is_high_season)
+            data["min_diff"] = data.apply(get_min_diff, axis=1)
+            data["delay"] = np.where(data["min_diff"] > threshold_in_minutes, 1, 0)
 
         features = pd.concat(
             [
