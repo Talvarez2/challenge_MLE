@@ -11,3 +11,5 @@ after rerunning the experiment with different data splits (random split 40 and r
 Another argument that can be given is that the improvement of the Desition Tree is far greater than the one for the Regression wich could we us greater chances of improvement in the Future.
 
 **TL;DR: We choose de XGBoost**
+
+# Part II
