@@ -12,3 +12,10 @@ __pycache__
 
 # ignore all .pyc files
 *.pyc
+
+# ignore all reports
+reports/
+reports
+
+# ignore all logs
+.coverage
