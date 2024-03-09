@@ -22,4 +22,5 @@ jobs:
           make model-test
       - name: run api tests
         run: |
-          make api-test
+          pytest --cov-config=.coveragerc tests/api
+
