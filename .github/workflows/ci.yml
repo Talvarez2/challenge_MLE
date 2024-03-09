@@ -19,7 +19,7 @@ jobs:
           pip install -r requirements-test.txt
       - name: run model tests
         run: |
-          make model-test
+          pytest --cov-config=.coveragerc model/api
       - name: run api tests
         run: |
           pytest --cov-config=.coveragerc tests/api
