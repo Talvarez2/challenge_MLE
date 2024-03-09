@@ -12,12 +12,14 @@ jobs:
     steps:
       - name: checkout repo
         uses: actions/checkout@main
-      - name: build application
+      - name: install dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-test.txt
-
-          # run tests
+      - name: run model tests
+        run: |
           make model-test
+      - name: run api tests
+        run: |
           make api-test
