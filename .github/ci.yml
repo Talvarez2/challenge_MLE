@@ -1,0 +1,17 @@
+name: "Continuous Integration"
+
+on:
+  push:
+    branches: ["ci_test"]
+  pull_request:
+    branches: ["ci_test"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@main
+      - name: build application
+        run: make model-test
+          make api-test
