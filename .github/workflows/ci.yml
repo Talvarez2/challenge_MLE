@@ -13,5 +13,10 @@ jobs:
       - name: checkout repo
         uses: actions/checkout@main
       - name: build application
-        run: make model-test
+        run: 
+          pip install --upgrade pip
+          pip install pytest
+
+          # run tests
+          make model-test
           make api-test
