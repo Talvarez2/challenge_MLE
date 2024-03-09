@@ -99,5 +99,5 @@ class TestModel(unittest.TestCase):
         )
 
         assert isinstance(predicted_targets, list)
-        assert len(predicted_targets) != features.shape[0]
+        assert len(predicted_targets) == features.shape[0]
         assert all(isinstance(predicted_target, int) for predicted_target in predicted_targets)
