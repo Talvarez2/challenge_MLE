@@ -13,7 +13,7 @@ jobs:
       - name: checkout repo
         uses: actions/checkout@main
       - name: build application
-        run: 
+        run: |
           pip install --upgrade pip
           pip install pytest
 
