@@ -1,6 +1,6 @@
 service: fastpi-aws-lambda
 
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 provider:
   name: aws
@@ -25,11 +25,4 @@ layers:
 functions:
   users:
     handler: challenge/api.handler
-    url: true  
-
-plugins:
-  - serverless-python-requirements
- 
-custom:
-  pythonRequirements:
-    dockerizePip: non-linux
+    url: true
