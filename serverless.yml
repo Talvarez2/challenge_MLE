@@ -25,6 +25,4 @@ layers:
 functions:
   users:
     handler: challenge/api.handler
-    layers:
-      - !Ref FastApiLambdaLayer 
     url: true  
