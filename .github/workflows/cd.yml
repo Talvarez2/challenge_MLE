@@ -31,6 +31,12 @@ jobs:
           pip install --target ./fastApi/python/  fastapi
           pip install --target ./fastApi/python/  mangum
 
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+
       - name: Deploy dev env
         run: |
           serverless deploy --stage dev --region us-west-1 --aws-s3-accelerate --verbose
