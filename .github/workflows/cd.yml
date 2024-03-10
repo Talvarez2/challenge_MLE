@@ -1,4 +1,4 @@
-name: "Continuous Delivery"
+name: 'Continuous Delivery'
 
 on:
   push:
@@ -13,28 +13,33 @@ jobs:
     environment: Actions Secrets
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3 # This action checks out for the latest code/branch that triggered this job
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - run: npm ci
+    - uses: actions/checkout@v3 # This action checks out for the latest code/branch that triggered this job
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
 
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.9
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
 
-      - name: Create layers
-        run: |
-          pip install --upgrade pip
-          ls # Checking the files in current dir
-          mkdir -p fastApi/python/ # Creating new directory for layer.
-          pip install --target ./fastApi/python/  fastapi
-          pip install --target ./fastApi/python/  mangum
-
-      - name: Deploy dev env
-        run: |
-          serverless deploy --stage dev --region us-west-1 --aws-s3-accelerate --verbose
+    - name: Install npm
+      run: |
+        npm cache clean --force
+        npm install --legacy-peer-deps  
+ 
+    - name: Create layers
+      run: |
+        pip install --upgrade pip
+        ls # Checking the files in current dir
+        mkdir -p fastApi/python/ # Creating new directory for layer.
+        pip install --target ./fastApi/python/  fastapi
+        pip install --target ./fastApi/python/  mangum    
+ 
+    - name: Deploy dev env
+      run: |
+        npm cache clean --force
+        npx serverless deploy --stage dev --region ap-south-1 --aws-s3-accelerate --verbose
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
