@@ -26,3 +26,10 @@ functions:
   users:
     handler: challenge/api.handler
     url: true  
+
+plugins:
+  - serverless-python-requirements
+ 
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
