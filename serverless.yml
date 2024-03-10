@@ -4,13 +4,14 @@ frameworkVersion: '3'
 
 provider:
   name: aws
-  runtime: python3.9
-  region: us-west-1
+  runtime: python3.11
+  region: ap-south-1
 
 package:
   individually: true
   patterns:
     - "!requirements.txt"
+    - "!package.json"
 
 layers:
   fastApi:
@@ -18,7 +19,7 @@ layers:
     name: fastApi
     description: lambda layer for fastapi related dependencies
     compatibleRuntimes:
-      - python3.9
+      - python3.11
     retain: false
 
 functions:
