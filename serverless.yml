@@ -5,13 +5,12 @@ frameworkVersion: '3'
 provider:
   name: aws
   runtime: python3.9
-  region: ap-south-1
+  region: us-west-1
 
 package:
   individually: true
   patterns:
     - "!requirements.txt"
-    - "!package.json"
 
 layers:
   fastApi:
