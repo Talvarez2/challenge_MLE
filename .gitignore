@@ -19,7 +19,3 @@ reports
 
 # ignore all logs
 .coverage
-
-# ignore node_modules
-node_modules/
-node_modules
