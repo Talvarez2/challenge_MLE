@@ -1,0 +1,28 @@
+service: fastpi-aws-lambda
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: us-west-1
+
+package:
+  individually: true
+  patterns:
+    - "requirements.txt"
+    - "!package.json"
+
+layers:
+  fastApi:
+    path: fastApi
+    name: fastApi
+    description: lambda layer for fastapi related dependencies
+    compatibleRuntimes:
+      - python3.11
+    retain: false
+
+functions:
+  users:
+    handler: challenge/api.handler
+    url: true

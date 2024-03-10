@@ -1,5 +1,6 @@
 import pandas as pd
 import fastapi
+from mangum import Mangum
 from contextlib import asynccontextmanager
 from challenge.model import DelayModel
 
@@ -16,6 +17,7 @@ async def lifespan(application: fastapi.FastAPI):
 
 
 app = fastapi.FastAPI()
+handler = Mangum(app)
 
 
 def check_valid_flight(flight):
