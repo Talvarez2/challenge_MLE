@@ -10,7 +10,7 @@ provider:
 package:
   individually: true
   patterns:
-    - "!requirements.txt"
+    - "requirements.txt"
     - "!package.json"
 
 layers:
