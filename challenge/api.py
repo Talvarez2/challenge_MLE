@@ -51,7 +51,7 @@ async def post_predict(data: dict) -> dict:
         print(features)
         prediction = model.predict(features)
 
-        return {"predict": prediction}
+        return {"predict": prediction.tolist()}
 
     except Exception as e:
         print(e)
