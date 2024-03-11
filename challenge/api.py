@@ -1,17 +1,19 @@
 import pandas as pd
 import fastapi
+import pickle
 from mangum import Mangum
 from contextlib import asynccontextmanager
-from challenge.model import DelayModel
 
-model = DelayModel()
+model = None
 
 
 @asynccontextmanager
 async def lifespan(application: fastapi.FastAPI):
-    data = await pd.read_csv(filepath_or_buffer="./data/data.csv")
-    features, target = await model.preprocess(data=data, target_column="delay")
-    await model.fit(features, target)
+    file_name = "./data/model.pkl"
+    model = pickle.load(open(file_name, "rb"))
+    # data = await pd.read_csv(filepath_or_buffer="./data/data.csv")
+    # features, target = await model.preprocess(data=data, target_column="delay")
+    # await model.fit(features, target)
     yield
     print("Cleaning up")
 

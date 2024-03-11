@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import xgboost as xgb
+import pickle
 
 from typing import Tuple, Union, List
 from challenge.config import threshold_in_minutes, top_10_features
@@ -34,7 +35,7 @@ class DelayModel:
             or
             pd.DataFrame: features.
         """
-        if 'Fecha-I' in data.columns:
+        if "Fecha-I" in data.columns:
             data["period_day"] = data["Fecha-I"].apply(get_period_day)
             data["high_season"] = data["Fecha-I"].apply(is_high_season)
             data["min_diff"] = data.apply(get_min_diff, axis=1)
@@ -100,3 +101,13 @@ class DelayModel:
         predictions = self._model.predict(features)
 
         return predictions.tolist()
+
+    def save_model(self, path: str) -> None:
+        """
+        Save model to disk.
+
+        Args:
+            path (str): path to save model.
+        """
+        # save
+        pickle.dump(self._model, open(path, "wb"))
