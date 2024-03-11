@@ -1,10 +1,41 @@
+import pandas as pd
+import numpy as np
+from challenge.config import threshold_in_minutes, top_10_features
 from datetime import datetime
 from challenge.config import (
     threshold_in_minutes,
     high_season_ranges,
     periods_of_the_day,
 )
+from typing import Union
 
+def preprocess(data: pd.DataFrame, target_column: str = None
+    ) -> Union[tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame]:
+    if "Fecha-I" in data.columns:
+        data["period_day"] = data["Fecha-I"].apply(get_period_day)
+        data["high_season"] = data["Fecha-I"].apply(is_high_season)
+        data["min_diff"] = data.apply(get_min_diff, axis=1)
+        data["delay"] = np.where(data["min_diff"] > threshold_in_minutes, 1, 0)
+
+    features = pd.concat(
+        [
+            pd.get_dummies(data["OPERA"], prefix="OPERA"),
+            pd.get_dummies(data["TIPOVUELO"], prefix="TIPOVUELO"),
+            pd.get_dummies(data["MES"], prefix="MES"),
+        ],
+        axis=1,
+    )
+    for feature in top_10_features:
+        if feature not in features:
+            features[feature] = 0
+
+    features = features[top_10_features]
+
+    if target_column:
+        target = data[[target_column]]
+        return features, target
+    else:
+        return features
 
 def get_period_day(date):
     # there is a slight chancge here qith the funtion in the model, as it no longer skips minutes between periods
