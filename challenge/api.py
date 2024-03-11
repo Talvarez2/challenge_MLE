@@ -3,14 +3,14 @@ import fastapi
 import pickle
 from mangum import Mangum
 from contextlib import asynccontextmanager
+from challenge.preprossessing_functions import preprocess
 
-model = None
+file_name = "./data/model.pkl"
+model = pickle.load(open(file_name, "rb"))
 
 
 @asynccontextmanager
 async def lifespan(application: fastapi.FastAPI):
-    file_name = "./data/model.pkl"
-    model = pickle.load(open(file_name, "rb"))
     # data = await pd.read_csv(filepath_or_buffer="./data/data.csv")
     # features, target = await model.preprocess(data=data, target_column="delay")
     # await model.fit(features, target)
@@ -44,9 +44,11 @@ async def get_health() -> dict:
 async def post_predict(data: dict) -> dict:
     try:
         flights = data["flights"]
+        print(flights)
         for flight in flights:
             check_valid_flight(flight)
-        features = model.preprocess(pd.DataFrame(flights, index=[0]))
+        features = preprocess(pd.DataFrame(flights, index=[0]))
+        print(features)
         prediction = model.predict(features)
 
         return {"predict": prediction}

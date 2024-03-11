@@ -4,12 +4,7 @@ import xgboost as xgb
 import pickle
 
 from typing import Tuple, Union, List
-from challenge.config import threshold_in_minutes, top_10_features
-from challenge.preprossessing_functions import (
-    get_period_day,
-    is_high_season,
-    get_min_diff,
-)
+from challenge.preprossessing_functions import preprocess
 
 
 class DelayModel:
@@ -35,31 +30,7 @@ class DelayModel:
             or
             pd.DataFrame: features.
         """
-        if "Fecha-I" in data.columns:
-            data["period_day"] = data["Fecha-I"].apply(get_period_day)
-            data["high_season"] = data["Fecha-I"].apply(is_high_season)
-            data["min_diff"] = data.apply(get_min_diff, axis=1)
-            data["delay"] = np.where(data["min_diff"] > threshold_in_minutes, 1, 0)
-
-        features = pd.concat(
-            [
-                pd.get_dummies(data["OPERA"], prefix="OPERA"),
-                pd.get_dummies(data["TIPOVUELO"], prefix="TIPOVUELO"),
-                pd.get_dummies(data["MES"], prefix="MES"),
-            ],
-            axis=1,
-        )
-        for feature in top_10_features:
-            if feature not in features:
-                features[feature] = 0
-
-        features = features[top_10_features]
-
-        if target_column:
-            target = data[[target_column]]
-            return features, target
-        else:
-            return features
+        return preprocess(data=data, target_column=target_column)
 
     def fit(self, features: pd.DataFrame, target: pd.DataFrame) -> None:
         """
