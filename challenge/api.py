@@ -69,7 +69,7 @@ async def validation_exception_handler(
 
 
 @app.get("/health", status_code=200)
-async def get_health() -> dict:
+async def get_health() -> dict[str, str]:
     """Health check endpoint."""
     return {"status": "OK"}
 
@@ -84,10 +84,7 @@ async def post_predict(data: PredictRequest) -> PredictResponse:
     Returns:
         Predicted delay labels for each flight.
     """
-    try:
-        flights_df = pd.DataFrame([f.dict() for f in data.flights])
-        features = preprocess(flights_df)
-        prediction = model.predict(features)
-        return PredictResponse(predict=prediction)
-    except Exception as e:
-        raise fastapi.HTTPException(status_code=400, detail=str(e))
+    flights_df = pd.DataFrame([f.dict() for f in data.flights])
+    features = preprocess(flights_df)
+    prediction = model.predict(features)
+    return PredictResponse(predict=prediction)

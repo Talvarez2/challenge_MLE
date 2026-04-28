@@ -18,12 +18,17 @@ def preprocess(
 ) -> tuple[pd.DataFrame, pd.DataFrame] | pd.DataFrame:
     """Prepare raw data for training or prediction.
 
+    Applies feature engineering (period of day, high season, delay label)
+    when raw columns are present, then one-hot encodes categorical features
+    and selects the top-10 most important ones.
+
     Args:
-        data: Raw flight data.
+        data: Raw flight data with at least OPERA, TIPOVUELO, and MES columns.
         target_column: If set, the target column is returned alongside features.
 
     Returns:
-        Features DataFrame, or a tuple of (features, target) when target_column is set.
+        Features DataFrame, or a tuple of (features, target) when
+        ``target_column`` is provided.
     """
     if "Fecha-I" in data.columns:
         data["period_day"] = data["Fecha-I"].apply(_get_period_day)
@@ -52,7 +57,14 @@ def preprocess(
 
 
 def _get_period_day(date: str) -> str:
-    """Classify a datetime string into a period of the day."""
+    """Classify a datetime string into a period of the day.
+
+    Args:
+        date: ISO-formatted datetime string (``YYYY-MM-DD HH:MM:SS``).
+
+    Returns:
+        One of ``"mañana"``, ``"tarde"``, or ``"noche"``.
+    """
     date_time = datetime.strptime(date, "%Y-%m-%d %H:%M:%S").time()
     for period, (start, end) in PERIODS_OF_THE_DAY.items():
         start_time = datetime.strptime(start, "%H:%M").time()
@@ -67,7 +79,11 @@ def _get_period_day(date: str) -> str:
 
 
 def _is_high_season(fecha: str) -> int:
-    """Return 1 if the date falls within a high-season range, 0 otherwise."""
+    """Return 1 if the date falls within a high-season range, 0 otherwise.
+
+    Args:
+        fecha: ISO-formatted datetime string.
+    """
     fecha_dt = datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
     year = fecha_dt.year
 
@@ -80,7 +96,11 @@ def _is_high_season(fecha: str) -> int:
 
 
 def _get_min_diff(row: pd.Series) -> float:
-    """Calculate the difference in minutes between operation and scheduled times."""
+    """Calculate the difference in minutes between operation and scheduled times.
+
+    Args:
+        row: A DataFrame row containing ``Fecha-O`` and ``Fecha-I`` columns.
+    """
     fecha_o = datetime.strptime(row["Fecha-O"], "%Y-%m-%d %H:%M:%S")
     fecha_i = datetime.strptime(row["Fecha-I"], "%Y-%m-%d %H:%M:%S")
     return (fecha_o - fecha_i).total_seconds() / 60

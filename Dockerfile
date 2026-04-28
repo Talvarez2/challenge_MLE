@@ -1,6 +1,8 @@
-FROM python:3.11-slim AS base
+FROM python:3.11-slim
 
 WORKDIR /app
+
+RUN useradd --create-home appuser
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -8,7 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY challenge/ challenge/
 COPY data/model.pkl data/model.pkl
 
-RUN useradd --create-home appuser
+RUN chown -R appuser:appuser /app
 USER appuser
 
 EXPOSE 8000

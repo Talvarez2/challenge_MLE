@@ -14,6 +14,7 @@ dist/
 build/
 .venv/
 venv/
+*.egg
 
 # Test / coverage reports
 reports/
@@ -26,6 +27,16 @@ node_modules/
 # IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
 # Archives
 *.zip
+
+# Environment
+.env
+.env.*
+
+# Model artifacts (large files — regenerate with save_model.py)
+# data/model.pkl

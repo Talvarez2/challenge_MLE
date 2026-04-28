@@ -1,5 +1,7 @@
 """Flight delay prediction model."""
 
+from __future__ import annotations
+
 import logging
 import pickle
 from pathlib import Path
@@ -13,7 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 class DelayModel:
-    """XGBoost classifier for predicting flight delays at SCL airport."""
+    """XGBoost classifier for predicting flight delays at SCL airport.
+
+    The model uses class-weight balancing (``scale_pos_weight``) to handle
+    the imbalanced delay/no-delay distribution in the training data.
+    """
 
     def __init__(self) -> None:
         self._model = xgb.XGBClassifier(random_state=1, learning_rate=0.01)
@@ -35,6 +41,9 @@ class DelayModel:
 
     def fit(self, features: pd.DataFrame, target: pd.DataFrame) -> None:
         """Fit the model with preprocessed data.
+
+        Automatically computes ``scale_pos_weight`` from the class distribution
+        so the minority class (delayed flights) gets higher weight.
 
         Args:
             features: Preprocessed feature matrix.
@@ -62,18 +71,20 @@ class DelayModel:
 
         return self._model.predict(features).tolist()
 
-    def save_model(self, path: str) -> None:
+    def save_model(self, path: str | Path) -> None:
         """Serialize the trained model to disk.
 
         Args:
             path: Destination file path.
         """
-        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as f:
             pickle.dump(self._model, f)
+        logger.info("Model saved to %s", path)
 
     @classmethod
-    def load_model(cls, path: str) -> "DelayModel":
+    def load_model(cls, path: str | Path) -> DelayModel:
         """Load a trained model from disk.
 
         Args:
@@ -85,6 +96,9 @@ class DelayModel:
         Raises:
             FileNotFoundError: If the model file does not exist.
         """
+        path = Path(path)
+        if not path.exists():
+            raise FileNotFoundError(f"Model file not found: {path}")
         instance = cls()
         with open(path, "rb") as f:
             instance._model = pickle.load(f)

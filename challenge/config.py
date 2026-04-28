@@ -1,5 +1,7 @@
 """Configuration constants for the flight delay prediction model."""
 
+from pathlib import Path
+
 PERIODS_OF_THE_DAY: dict[str, list[str]] = {
     "mañana": ["05:00", "11:59"],
     "tarde": ["12:00", "18:59"],
@@ -28,4 +30,4 @@ TOP_10_FEATURES: list[str] = [
     "OPERA_Copa Air",
 ]
 
-MODEL_PATH: str = "./data/model.pkl"
+MODEL_PATH: Path = Path("./data/model.pkl")
