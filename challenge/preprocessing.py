@@ -1,7 +1,6 @@
 """Preprocessing functions for flight delay prediction."""
 
 from datetime import datetime
-from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -16,7 +15,7 @@ from challenge.config import (
 
 def preprocess(
     data: pd.DataFrame, target_column: str | None = None
-) -> Union[tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame] | pd.DataFrame:
     """Prepare raw data for training or prediction.
 
     Args:

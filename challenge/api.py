@@ -1,17 +1,19 @@
 """FastAPI application for flight delay prediction."""
 
-import pickle
-from typing import Any
+import logging
 
 import fastapi
 import pandas as pd
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from mangum import Mangum
 from pydantic import BaseModel, validator
 
+from challenge.config import MODEL_PATH
+from challenge.model import DelayModel
 from challenge.preprocessing import preprocess
+
+logger = logging.getLogger(__name__)
 
 VALID_TIPOVUELO = {"N", "I"}
 VALID_MES_RANGE = range(1, 13)
@@ -49,15 +51,13 @@ class PredictResponse(BaseModel):
     predict: list[int]
 
 
-def _load_model() -> Any:
-    with open("./data/model.pkl", "rb") as f:
-        return pickle.load(f)
-
-
-model = _load_model()
+try:
+    model = DelayModel.load_model(MODEL_PATH)
+except FileNotFoundError:
+    logger.warning("Model file not found at %s; predictions will return zeros.", MODEL_PATH)
+    model = DelayModel()
 
 app = fastapi.FastAPI(title="Flight Delay Prediction API")
-handler = Mangum(app)
 
 
 @app.exception_handler(RequestValidationError)
@@ -88,6 +88,6 @@ async def post_predict(data: PredictRequest) -> PredictResponse:
         flights_df = pd.DataFrame([f.dict() for f in data.flights])
         features = preprocess(flights_df)
         prediction = model.predict(features)
-        return PredictResponse(predict=prediction.tolist())
+        return PredictResponse(predict=prediction)
     except Exception as e:
         raise fastapi.HTTPException(status_code=400, detail=str(e))

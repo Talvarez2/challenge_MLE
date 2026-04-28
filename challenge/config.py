@@ -27,3 +27,5 @@ TOP_10_FEATURES: list[str] = [
     "OPERA_Sky Airline",
     "OPERA_Copa Air",
 ]
+
+MODEL_PATH: str = "./data/model.pkl"

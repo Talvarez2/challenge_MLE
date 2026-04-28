@@ -1,13 +1,15 @@
 """Flight delay prediction model."""
 
+import logging
 import pickle
 from pathlib import Path
-from typing import Union
 
 import pandas as pd
 import xgboost as xgb
 
 from challenge.preprocessing import preprocess
+
+logger = logging.getLogger(__name__)
 
 
 class DelayModel:
@@ -19,7 +21,7 @@ class DelayModel:
 
     def preprocess(
         self, data: pd.DataFrame, target_column: str | None = None
-    ) -> Union[tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame]:
+    ) -> tuple[pd.DataFrame, pd.DataFrame] | pd.DataFrame:
         """Prepare raw data for training or prediction.
 
         Args:
@@ -69,3 +71,23 @@ class DelayModel:
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as f:
             pickle.dump(self._model, f)
+
+    @classmethod
+    def load_model(cls, path: str) -> "DelayModel":
+        """Load a trained model from disk.
+
+        Args:
+            path: Path to the serialized model file.
+
+        Returns:
+            A DelayModel instance with the loaded model.
+
+        Raises:
+            FileNotFoundError: If the model file does not exist.
+        """
+        instance = cls()
+        with open(path, "rb") as f:
+            instance._model = pickle.load(f)
+        instance._fitted = True
+        logger.info("Model loaded from %s", path)
+        return instance

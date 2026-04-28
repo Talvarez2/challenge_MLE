@@ -7,20 +7,25 @@ on:
     branches: ["main"]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout repo
-        uses: actions/checkout@main
-      - name: install dependencies
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-test.txt
-      - name: run model tests
-        run: |
-          pytest --cov-config=.coveragerc tests/model
-      - name: run api tests
-        run: |
-          pytest --cov-config=.coveragerc tests/api
 
+      - name: Run model tests
+        run: make model-test
+
+      - name: Run API tests
+        run: make api-test

@@ -27,8 +27,5 @@ node_modules/
 .vscode/
 .idea/
 
-# Data artifacts (keep tracked via Git LFS or explicit add)
-*.pkl
-
 # Archives
 *.zip
