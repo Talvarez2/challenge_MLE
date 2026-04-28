@@ -1,11 +1,17 @@
-from challenge.model import DelayModel
+"""Train and save the flight delay prediction model."""
+
 import pandas as pd
 
-model = DelayModel()
-data = pd.read_csv(filepath_or_buffer="./data/data.csv")
+from challenge.model import DelayModel
 
-features, target = model.preprocess(data=data, target_column="delay")
 
-model.fit(features=features, target=target)
+def main() -> None:
+    model = DelayModel()
+    data = pd.read_csv("./data/data.csv")
+    features, target = model.preprocess(data=data, target_column="delay")
+    model.fit(features=features, target=target)
+    model.save_model("./data/model.pkl")
 
-model.save_model("./data/model.pkl")
+
+if __name__ == "__main__":
+    main()

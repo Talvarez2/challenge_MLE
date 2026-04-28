@@ -1,25 +1,34 @@
-# ignore all jupyter notebook checkpoints
+# macOS artifacts
+.DS_Store
+__MACOSX/
+
+# Jupyter
 .ipynb_checkpoints/
-.ipynb_checkpoints
 
-# ignore virtual environment files
-venv/
-venv
-
-# ignore pycache
+# Python
 __pycache__/
-__pycache__
-
-# ignore all .pyc files
 *.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
 
-# ignore all reports
+# Test / coverage reports
 reports/
-reports
-
-# ignore all logs
 .coverage
+htmlcov/
 
-# ignore node_modules
+# Node
 node_modules/
-node_modules
+
+# IDE
+.vscode/
+.idea/
+
+# Data artifacts (keep tracked via Git LFS or explicit add)
+*.pkl
+
+# Archives
+*.zip

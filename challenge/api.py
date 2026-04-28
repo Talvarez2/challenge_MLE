@@ -1,58 +1,93 @@
-import pandas as pd
-import fastapi
+"""FastAPI application for flight delay prediction."""
+
 import pickle
+from typing import Any
+
+import fastapi
+import pandas as pd
+from fastapi import Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from mangum import Mangum
-from contextlib import asynccontextmanager
-from challenge.preprossessing_functions import preprocess
+from pydantic import BaseModel, validator
 
-file_name = "./data/model.pkl"
-model = pickle.load(open(file_name, "rb"))
+from challenge.preprocessing import preprocess
 
-
-@asynccontextmanager
-async def lifespan(application: fastapi.FastAPI):
-    # data = await pd.read_csv(filepath_or_buffer="./data/data.csv")
-    # features, target = await model.preprocess(data=data, target_column="delay")
-    # await model.fit(features, target)
-    yield
-    print("Cleaning up")
+VALID_TIPOVUELO = {"N", "I"}
+VALID_MES_RANGE = range(1, 13)
 
 
-app = fastapi.FastAPI()
+class Flight(BaseModel):
+    """Schema for a single flight prediction request."""
+
+    OPERA: str
+    TIPOVUELO: str
+    MES: int
+
+    @validator("TIPOVUELO")
+    def _validate_tipovuelo(cls, v: str) -> str:
+        if v not in VALID_TIPOVUELO:
+            raise ValueError(f"TIPOVUELO must be one of {VALID_TIPOVUELO}, got '{v}'")
+        return v
+
+    @validator("MES")
+    def _validate_mes(cls, v: int) -> int:
+        if v not in VALID_MES_RANGE:
+            raise ValueError(f"MES must be between 1 and 12, got {v}")
+        return v
+
+
+class PredictRequest(BaseModel):
+    """Schema for the /predict endpoint request body."""
+
+    flights: list[Flight]
+
+
+class PredictResponse(BaseModel):
+    """Schema for the /predict endpoint response."""
+
+    predict: list[int]
+
+
+def _load_model() -> Any:
+    with open("./data/model.pkl", "rb") as f:
+        return pickle.load(f)
+
+
+model = _load_model()
+
+app = fastapi.FastAPI(title="Flight Delay Prediction API")
 handler = Mangum(app)
 
 
-def check_valid_flight(flight):
-    if "OPERA" not in flight:
-        raise Exception("OPERA column is missing")
-    elif "TIPOVUELO" not in flight:
-        raise Exception("TIPOVUELO column is missing")
-    elif flight["TIPOVUELO"] not in ["N", "I"]:
-        raise Exception("TIPOVUELO value is not valid")
-    elif "MES" not in flight:
-        raise Exception("MES column is missing")
-    elif flight["MES"] not in range(1, 13):
-        raise Exception("MES value is not valid")
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    request: Request, exc: RequestValidationError
+) -> JSONResponse:
+    """Return 400 instead of 422 for validation errors to match test expectations."""
+    return JSONResponse(status_code=400, content={"detail": str(exc)})
 
 
 @app.get("/health", status_code=200)
 async def get_health() -> dict:
+    """Health check endpoint."""
     return {"status": "OK"}
 
 
-@app.post("/predict", status_code=200)
-async def post_predict(data: dict) -> dict:
+@app.post("/predict", status_code=200, response_model=PredictResponse)
+async def post_predict(data: PredictRequest) -> PredictResponse:
+    """Predict flight delays.
+
+    Args:
+        data: Request body containing a list of flights.
+
+    Returns:
+        Predicted delay labels for each flight.
+    """
     try:
-        flights = data["flights"]
-        print(flights)
-        for flight in flights:
-            check_valid_flight(flight)
-        features = preprocess(pd.DataFrame(flights, index=[0]))
-        print(features)
+        flights_df = pd.DataFrame([f.dict() for f in data.flights])
+        features = preprocess(flights_df)
         prediction = model.predict(features)
-
-        return {"predict": prediction.tolist()}
-
+        return PredictResponse(predict=prediction.tolist())
     except Exception as e:
-        print(e)
         raise fastapi.HTTPException(status_code=400, detail=str(e))

@@ -1,16 +1,21 @@
-periods_of_the_day = {
-    "malana": ["05:00", "12:00"],
-    "tarde": ["12:00", "19:00"],
-    "noche": ["19:00", "05:00"],
+"""Configuration constants for the flight delay prediction model."""
+
+PERIODS_OF_THE_DAY: dict[str, list[str]] = {
+    "mañana": ["05:00", "11:59"],
+    "tarde": ["12:00", "18:59"],
+    "noche": ["19:00", "04:59"],
 }
-high_season_ranges = [
+
+HIGH_SEASON_RANGES: list[tuple[str, str]] = [
     ("15-Dec", "31-Dec"),
     ("1-Jan", "3-Mar"),
     ("15-Jul", "31-Jul"),
     ("11-Sep", "30-Sep"),
 ]
-threshold_in_minutes = 15
-top_10_features = [
+
+THRESHOLD_IN_MINUTES: int = 15
+
+TOP_10_FEATURES: list[str] = [
     "OPERA_Latin American Wings",
     "MES_7",
     "MES_10",
